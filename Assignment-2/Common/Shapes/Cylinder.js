@@ -1,16 +1,15 @@
 /////////////////////////////////////////////////////////////////////////////
 //
-//  Cone.js
+//  Cylinder.js
 //
-//    Class for rendering a cone with a height of one, and base radius of
-//      one (diameter of two).  The origin of the cone is in the middle of
-//      the disk forming the bottom, with the apex of the cone one unit up
-//      the +z axis.
+//  Class for rendering a cylinder with a height of one, and base radius of
+//    one (diameter of two).  The origin of the cylinder is in the middle of
+//    the disk at z = 0.
 //
 
 'use strict;'
 
-class Cone {
+class Cylinder {
     constructor(gl, numSides, vertexShader, fragmentShader) {
 
         vertexShader ||= `
@@ -20,24 +19,20 @@ class Cone {
             uniform mat4 MV; // Model-view transformation
 
             void main() {
+                float iid = float(gl_InstanceID);
                 vec4  v;  // our generated vertex
 
-                // If we're the first vertex, we're at the center of the disk
-                //   forming either the base or top of the cone.  This means,
-                if (gl_VertexID == 0) {
-                    float iid = float(gl_InstanceID);
-                    v = vec4(0.0, 0.0, iid, 1.0);
-                }
-                else {
-                    // Since vertex ID zero is reserved for the center vertex
-                    //   of the cone, we subtract one from the current 
-                    //   gl_VertexID so we can get a useful angle index 
-                    float vid = float(gl_VertexID) - 1.0;
+                if (gl_VertexID > 0 && gl_VertexID < 5) {
                     const float Pi = 3.14159265358979;
-                    float dir = gl_InstanceID == 0 ? 1.0 : -1.0;
-                    float angle = dir * vid * 2.0 * Pi / float(numSides);
-                    v = vec4(cos(angle), sin(angle), 0.0, 1.0);
+                    float delta = 2.0 * Pi / float(numSides);
+
+                    float side = float(gl_VertexID % 2);
+                    float angle = (iid - side) * delta;
+                    
+                    v.xy = vec2(cos(angle), sin(angle));
                 }
+
+                v.zw = vec2(float(gl_VertexID / 3), 1.0);
 
                 gl_Position = P * MV * v;
             }
@@ -90,7 +85,7 @@ class Cone {
             program.P();
             program.color();
 
-            gl.drawArraysInstanced(gl.TRIANGLE_FAN, 0, numSides + 2, 2);
+            gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 6, numSides);
 
             gl.useProgram(null);
         };
@@ -99,8 +94,7 @@ class Cone {
     get AABB() { 
         return { 
             min : [-1.0, -1.0, 0.0], 
-            max : [1.0, 1.0, 1.0] 
-        };
+            max : [1.0, 1.0, 1.0] };
     }
 };
 

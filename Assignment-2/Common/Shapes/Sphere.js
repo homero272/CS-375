@@ -1,43 +1,44 @@
 /////////////////////////////////////////////////////////////////////////////
 //
-//  Cone.js
+//  Sphere.js
 //
-//    Class for rendering a cone with a height of one, and base radius of
-//      one (diameter of two).  The origin of the cone is in the middle of
-//      the disk forming the bottom, with the apex of the cone one unit up
-//      the +z axis.
+//  Class for rendering a sphere, centered at the origin, with a radius
+//    of one.
 //
 
 'use strict;'
 
-class Cone {
-    constructor(gl, numSides, vertexShader, fragmentShader) {
+class Sphere {
+    constructor(gl, numStrips, numSlices, vertexShader, fragmentShader) {
 
         vertexShader ||= `
-            uniform int  numSides; // number of slices around the perimeter
+            uniform int numStrips; // number of longitudinal divisions
+            uniform int numSlices; // number of latitudinal divisions
 
             uniform mat4 P;  // Projection transformation
             uniform mat4 MV; // Model-view transformation
 
             void main() {
+                float iid = float(gl_InstanceID);
                 vec4  v;  // our generated vertex
 
-                // If we're the first vertex, we're at the center of the disk
-                //   forming either the base or top of the cone.  This means,
-                if (gl_VertexID == 0) {
-                    float iid = float(gl_InstanceID);
-                    v = vec4(0.0, 0.0, iid, 1.0);
+                if (gl_VertexID > 0 && gl_VertexID < 2*numSlices) {
+                    const float Pi = 3.14159265358979;
+                    float dPhi = Pi / float(numSlices);
+                    float dTheta = 2.0 * Pi / float(numStrips);
+
+                    float slice = float(gl_VertexID / 2);
+                    float phi = slice * dPhi;
+                    float side = float(gl_VertexID % 2);
+                    float theta = (iid + side) * dTheta;
+                    
+                    v.xy = sin(phi) * vec2(cos(theta), sin(theta));
+                    v.z  = cos(phi);
                 }
                 else {
-                    // Since vertex ID zero is reserved for the center vertex
-                    //   of the cone, we subtract one from the current 
-                    //   gl_VertexID so we can get a useful angle index 
-                    float vid = float(gl_VertexID) - 1.0;
-                    const float Pi = 3.14159265358979;
-                    float dir = gl_InstanceID == 0 ? 1.0 : -1.0;
-                    float angle = dir * vid * 2.0 * Pi / float(numSides);
-                    v = vec4(cos(angle), sin(angle), 0.0, 1.0);
-                }
+                    v.z = -2.0 * float(gl_VertexID > 0) + 1.0;
+                }   
+                v.w = 1.0;
 
                 gl_Position = P * MV * v;
             }
@@ -80,7 +81,8 @@ class Cone {
             gl.uniform1i(location, value);
         };
 
-        setupConstant("numSides", numSides);
+        setupConstant("numStrips", numStrips);
+        setupConstant("numSlices", numSlices);
         gl.useProgram(null);
 
         this.draw = () => {
@@ -90,7 +92,8 @@ class Cone {
             program.P();
             program.color();
 
-            gl.drawArraysInstanced(gl.TRIANGLE_FAN, 0, numSides + 2, 2);
+            gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 
+                2*(numSlices + 1), numStrips);
 
             gl.useProgram(null);
         };
@@ -98,7 +101,7 @@ class Cone {
 
     get AABB() { 
         return { 
-            min : [-1.0, -1.0, 0.0], 
+            min : [-1.0, -1.0, -1.0], 
             max : [1.0, 1.0, 1.0] 
         };
     }

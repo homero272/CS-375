@@ -4,7 +4,7 @@ let ms;
 let angle = 0.0;
 let scaleChange = 0.0;
 let isShrinking = false;
-
+let randomColor = vec4(Math.random(), Math.random(), Math.random(), 1.0);
 function init() {
     let canvas = document.getElementById("webgl-canvas");
     gl = canvas.getContext("webgl2");
@@ -12,10 +12,11 @@ function init() {
     
     gl.clearColor(0.2, 0.2, 0.2, 1.0);
     gl.enable(gl.DEPTH_TEST);
+
     // Initialize different shapes
     axes = new Axes(gl);
     cone = new Cone(gl, 36);    
-    sphere = new Sphere(gl, 36, 18); 
+    sphere = new Sphere(gl, 100, 100); 
 
     // Initialize MatrixStack for transformations
     ms = new MatrixStack();
@@ -40,10 +41,17 @@ function render() {
     }
     if(isShrinking){
         scaleChange = 0.0;
+        //only change the color every so often
+        randomColor = vec4(Math.random(), Math.random(), Math.random(), 1.0);
     }
     else{
         scaleChange += 0.02;
     }
+
+    
+   
+
+    
     
     
     // 1. Draw Axes 
@@ -59,7 +67,7 @@ function render() {
     ms.rotate(angle, [1,1,0])
     ms.translate(-0.5, -0.5, 0);  
     ms.scale(0.2, 0.2, 0.2);
-    cone.color = vec4(66, 135, 245, 1.0);
+    cone.color = randomColor;
     cone.MV = ms.current();
     cone.draw();
     ms.pop();
@@ -69,12 +77,12 @@ function render() {
     ms.translate(0.5, 0.5, 0);  
     ms.scale(0.3, 0.3, 0.3); 
     ms.scale(scaleChange,scaleChange,scaleChange);
-    sphere.color = vec4(252, 186, 3, 1.0); 
+    sphere.color = vec4(0.2,0.5,.6,1.0);
     sphere.MV = ms.current();
     sphere.draw();
     ms.pop();
 
-    // Request the next frame
+    
     requestAnimationFrame(render);
 }
 

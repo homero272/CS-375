@@ -31,19 +31,20 @@ function isVector(v) {
 
 function vec2() {
     let result = _argumentsToArray( arguments );
-    result.type = "vec2";
     
     switch ( result.length ) {
         case 0: result.push( 0.0 );
         case 1: result.push( 0.0 );
     }
     
-    return result.splice( 0, 2 );
+    result = result.splice( 0, 2 );
+    result.type = "vec2";
+
+    return result;
 }
 
 function vec3() {
     let result = _argumentsToArray( arguments );
-    result.type = "vec3";
      
     switch ( result.length ) {
         case 0: result.push( 0.0 );
@@ -51,12 +52,12 @@ function vec3() {
         case 2: result.push( 0.0 );
     }
     
-    return result.splice( 0, 3 );
+    result = result.splice( 0, 3 );
+    result.type = "vec3";
 }
 
 function vec4() {
-    let result = _argumentsToArray( arguments );
-    result.type = "vec4";
+    var result = _argumentsToArray( arguments );
     
     switch ( result.length ) {
         case 0: result.push( 0.0 );
@@ -65,7 +66,10 @@ function vec4() {
         case 3: result.push( 1.0 );
     }
     
-    return result.splice( 0, 4 );
+    result = result.splice( 0, 4 );
+    result.type = "vec4";
+
+    return result;
 }
 
 //----------------------------------------------------------------------------

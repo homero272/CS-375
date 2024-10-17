@@ -7,7 +7,7 @@
 
 class IndexedCube {
     constructor(gl, vertexShader, fragmentShader) {
-        vertexShader = `
+        vertexShader ||= `
             in vec4 aPosition;
             in vec4 aColor;
 
@@ -21,15 +21,15 @@ class IndexedCube {
                 vColor = aColor;
             }`;
 
-    fragmentShader = 
-        `in vec4 vColor;
-        out vec4 fColor;
+        fragmentShader ||= 
+            `in vec4 vColor;
+            out vec4 fColor;
 
-        void main() {
-            fColor = gl_FrontFacing? vColor : vec4(0,0,0,0);
-    }`;
+            void main() {
+                fColor = gl_FrontFacing? vColor : vec4(0,0,0,0);
+        }`;
 
-        // Define unique vertex positions for the cube (8 vertices)
+        // vertex positions for the cube (8 vertices)
         const positions = new Float32Array([
             -0.5, -0.5,  0.5, // 0: Front-bottom-left
              0.5, -0.5,  0.5, // 1: Front-bottom-right
@@ -41,7 +41,7 @@ class IndexedCube {
             -0.5,  0.5, -0.5  // 7: Back-top-left
         ]);
 
-        // Define colors corresponding to each vertex (same for each face)
+        //colors corresponding to each vertex (same for each face)
         const colors = new Float32Array([
             1.0, 0.0, 0.0, 1.0, // Red
             1.0, 0.0, 0.0, 1.0, // red

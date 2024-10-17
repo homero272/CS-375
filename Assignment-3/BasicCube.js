@@ -7,7 +7,7 @@
 
 class BasicCube {
     constructor(gl, vertexShader, fragmentShader) {
-        vertexShader = `
+        vertexShader ||= `
                 in vec4 aPosition;
                 in vec4 aColor;
 
@@ -20,7 +20,7 @@ class BasicCube {
                     gl_Position = P * MV * aPosition;
                     vColor = aColor;
 }`;
-        fragmentShader = `
+        fragmentShader ||= `
                 in vec4 vColor;
                 out vec4 fColor;
 

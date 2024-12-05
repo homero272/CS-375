@@ -33,3 +33,21 @@ canvas {
   top: 50px;
   text-align: center;
 }
+#toggleButton {
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  position: absolute;
+  top: 10px;
+  left: 100px;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+#toggleButton:hover {
+  background-color: #0056b3;
+}

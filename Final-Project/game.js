@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const loader = new THREE.GLTFLoader();
 
   //Lighting setup for pitch
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
   scene.add(ambientLight);
 
   const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -175,10 +175,11 @@ document.addEventListener("DOMContentLoaded", function () {
     event.stopPropagation(); // Stop the click event from propagating
     toggleDayNight(); // Call the toggle function
   };
+  //function to toggle day and night
   function toggleDayNight() {
     isDay = !isDay;
-    scene.background = new THREE.Color(isDay ? 0x87ceeb : 0x000033); // Day: Sky blue, Night: Dark blue
-
+    scene.background = new THREE.Color(isDay ? 0x87ceeb : 0x000033); 
+    directionalLight.intensity = isDay ? 0.75 : 1.0; 
   }
 
 
